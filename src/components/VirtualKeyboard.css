@@ -1,0 +1,146 @@
+.virtual-keyboard {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #d2d5db;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.virtual-keyboard.visible {
+  transform: translateY(0);
+}
+
+.keyboard-container {
+  padding: 8px 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  outline: none;
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 3px;
+}
+
+/* Hàng thứ 2 (a,s,d...) thụt vào */
+.keyboard-row:nth-child(2) {
+  padding: 0 20px;
+}
+
+.key {
+  min-width: 31px;
+  height: 42px;
+  border: none;
+  border-radius: 5px;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 22px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  position: relative;
+  flex: 1;
+}
+
+.key:active,
+.key.pressed {
+  background-color: #b2b5be;
+  transform: scale(1.1);
+  box-shadow: 0 0 0 rgba(0,0,0,0.35);
+}
+
+/* Special keys styling */
+.modifier-key {
+  background-color: #aeb2bb;
+  color: #000000;
+  font-size: 16px;
+  flex: 1.25;
+}
+
+/* Shift và Backspace */
+.keyboard-row:nth-child(3) .key:first-child,
+.keyboard-row:nth-child(3) .key:last-child {
+  flex: 1.25;
+}
+
+.modifier-key.active {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.space-key {
+  flex: 5;
+  font-size: 16px;
+  color: #8e8e93;
+}
+
+.space-key.cursor-mode {
+  background-color: #e8e8e8;
+}
+
+.space-key.cursor-mode::after {
+  content: '← →';
+  position: absolute;
+  font-size: 14px;
+  color: #007AFF;
+  opacity: 0.8;
+}
+
+.return-key {
+  background-color: #007AFF;
+  color: #ffffff;
+  flex: 1.5;
+  font-size: 16px;
+}
+
+.return-key:active {
+  background-color: #0051a8;
+}
+
+.lang-key {
+  background-color: #aeb2bb;
+  color: #000000;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 45px;
+  flex: 0.8;
+}
+
+.lang-key.vietnamese {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 400px) {
+  .key {
+    min-width: 26px;
+    height: 38px;
+    font-size: 18px;
+  }
+  
+  .keyboard-row {
+    gap: 5px;
+  }
+  
+  .keyboard-row:nth-child(2) {
+    padding: 0 15px;
+  }
+} 

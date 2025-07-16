@@ -1,0 +1,64 @@
+.simple-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.simple-input {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #007AFF;
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+  /* Cho phép select text */
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Trên mobile, vẫn cho phép tương tác với input readonly */
+@media (max-width: 768px) {
+  .simple-input[readonly] {
+    /* Vẫn cho phép tương tác */
+    pointer-events: auto;
+    /* Giữ cursor và selection */
+    -webkit-user-select: text;
+    user-select: text;
+  }
+}
+
+.simple-input:focus {
+  border-color: #007AFF;
+  box-shadow: 0 0 0 1px #007AFF;
+}
+
+/* Placeholder style */
+.simple-input::placeholder {
+  color: #999;
+}
+
+/* Remove input styling on mobile */
+.simple-input::-webkit-outer-spin-button,
+.simple-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.simple-input.fake-focus {
+  caret-color: #007AFF;
+}
+
+.custom-cursor {
+  position: absolute;
+  top: 11px;
+  width: 2px;
+  height: 20px;
+  background-color: #007AFF;
+  animation: blink 1s infinite;
+  pointer-events: none;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+} 
