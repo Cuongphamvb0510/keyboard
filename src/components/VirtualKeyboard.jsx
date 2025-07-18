@@ -104,7 +104,9 @@ const VirtualKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible,
   };
 
   const handleSpaceDown = (e) => {
-    e.preventDefault();
+    if (e.cancelable) {
+      e.preventDefault();
+    }
     setIsSpacePressed(true);
     
     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
@@ -122,7 +124,9 @@ const VirtualKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible,
 
   const handleSpaceMove = (e) => {
     if (cursorMoveMode && spaceStartX !== null) {
-      e.preventDefault();
+      if (e.cancelable) {
+        e.preventDefault();
+      }
       const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
       const deltaX = clientX - spaceStartX;
       
@@ -136,7 +140,9 @@ const VirtualKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible,
   };
 
   const handleSpaceUp = (e) => {
-    e.preventDefault();
+    if (e.cancelable) {
+      e.preventDefault();
+    }
     
     // Clear long press timer
     if (spaceLongPressTimer.current) {
@@ -156,7 +162,9 @@ const VirtualKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible,
   };
 
   const handleBackspaceDown = (e) => {
-    e.preventDefault();
+    if (e.cancelable) {
+      e.preventDefault();
+    }
     setPressedKey('backspace');
     
     // Xóa ký tự đầu tiên ngay lập tức
@@ -182,7 +190,9 @@ const VirtualKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible,
   };
 
   const handleBackspaceUp = (e) => {
-    e.preventDefault();
+    if (e.cancelable) {
+      e.preventDefault();
+    }
     setPressedKey(null);
     
     // Clear all timers
@@ -201,7 +211,9 @@ const VirtualKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible,
   };
 
   const handleButtonPress = (e, key) => {
-    e.preventDefault();
+    if (e.cancelable) {
+      e.preventDefault();
+    }
     e.stopPropagation();
     handleKeyPress(key);
   };
@@ -241,11 +253,15 @@ const VirtualKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible,
       className={`virtual-keyboard ${isVisible ? 'visible' : ''}`}
       onMouseDown={(e) => {
         // Ngăn chặn blur event khi click vào bất kỳ đâu trong keyboard
-        e.preventDefault();
+        if (e.cancelable) {
+          e.preventDefault();
+        }
       }}
       onTouchStart={(e) => {
         // Ngăn chặn blur event khi touch vào bất kỳ đâu trong keyboard trên mobile
-        e.preventDefault();
+        if (e.cancelable) {
+          e.preventDefault();
+        }
       }}
     >
       <div 
@@ -253,11 +269,15 @@ const VirtualKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible,
         tabIndex={-1}
         onMouseDown={(e) => {
           // Ngăn chặn blur event khi click vào keyboard
-          e.preventDefault();
+          if (e.cancelable) {
+            e.preventDefault();
+          }
         }}
         onTouchStart={(e) => {
           // Ngăn chặn blur event khi touch vào keyboard trên mobile
-          e.preventDefault();
+          if (e.cancelable) {
+            e.preventDefault();
+          }
         }}
       >
         {currentLayout.map((row, rowIndex) => (
