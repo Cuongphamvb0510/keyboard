@@ -25,10 +25,28 @@ function App() {
     document.title = 'iPhone Keyboard'
   }, [])
 
+  // Đảm bảo input giữ focus khi keyboard hiển thị
+  useEffect(() => {
+    if (showKeyboard && simpleInputRef.current) {
+      simpleInputRef.current.focus();
+    }
+  }, [showKeyboard]);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (appRef.current && !appRef.current.contains(event.target)) {
-        setShowKeyboard(false)
+      // Kiểm tra xem click có phải ở input hoặc container của input không
+      const inputElement = simpleInputRef.current?.getInputElement?.();
+      const inputContainer = inputElement?.parentElement;
+      const isClickOnInput = (inputElement && inputElement.contains(event.target)) || 
+                            (inputContainer && inputContainer.contains(event.target));
+      
+      // Kiểm tra xem click có phải ở keyboard không
+      const keyboardElement = document.querySelector('.virtual-keyboard');
+      const isClickOnKeyboard = keyboardElement && keyboardElement.contains(event.target);
+      
+      // Chỉ ẩn keyboard khi click không phải ở input VÀ không phải ở keyboard
+      if (!isClickOnInput && !isClickOnKeyboard && showKeyboard) {
+        setShowKeyboard(false);
       }
     }
 

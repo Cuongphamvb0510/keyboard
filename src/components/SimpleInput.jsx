@@ -68,6 +68,10 @@ const SimpleInput = forwardRef(({ value, onChange, placeholder, onFocus, onBlur 
     
     focus: () => {
       inputRef.current?.focus();
+    },
+    
+    getInputElement: () => {
+      return inputRef.current;
     }
   }));
 

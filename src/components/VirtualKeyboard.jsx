@@ -11,10 +11,20 @@ const VirtualKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible,
   const [cursorMoveMode, setCursorMoveMode] = useState(false);
   const [isVietnamese, setIsVietnamese] = useState(false);
   const spaceLongPressTimer = useRef(null);
+  const backspaceLongPressTimer = useRef(null);
+  const backspaceIntervalTimer = useRef(null);
+  const backspaceAccelerationTimer = useRef(null);
 
   useEffect(() => {
     // Detect if device supports touch
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    
+    // Cleanup timers on unmount
+    return () => {
+      if (backspaceLongPressTimer.current) clearTimeout(backspaceLongPressTimer.current);
+      if (backspaceIntervalTimer.current) clearInterval(backspaceIntervalTimer.current);
+      if (backspaceAccelerationTimer.current) clearTimeout(backspaceAccelerationTimer.current);
+    };
   }, []);
 
   const lettersLayout = [
@@ -145,6 +155,51 @@ const VirtualKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible,
     setSpaceStartX(null);
   };
 
+  const handleBackspaceDown = (e) => {
+    e.preventDefault();
+    setPressedKey('backspace');
+    
+    // Xóa ký tự đầu tiên ngay lập tức
+    onBackspace();
+    
+    // Bắt đầu timer để xóa liên tục sau 500ms
+    backspaceLongPressTimer.current = setTimeout(() => {
+      // Xóa với tốc độ chậm ban đầu (3 ký tự/giây)
+      backspaceIntervalTimer.current = setInterval(() => {
+        onBackspace();
+      }, 100);
+      
+      // Sau 2 giây, tăng tốc độ xóa (10 ký tự/giây)
+      backspaceAccelerationTimer.current = setTimeout(() => {
+        if (backspaceIntervalTimer.current) {
+          clearInterval(backspaceIntervalTimer.current);
+          backspaceIntervalTimer.current = setInterval(() => {
+            onBackspace();
+          }, 50);
+        }
+      }, 2000);
+    }, 500);
+  };
+
+  const handleBackspaceUp = (e) => {
+    e.preventDefault();
+    setPressedKey(null);
+    
+    // Clear all timers
+    if (backspaceLongPressTimer.current) {
+      clearTimeout(backspaceLongPressTimer.current);
+      backspaceLongPressTimer.current = null;
+    }
+    if (backspaceIntervalTimer.current) {
+      clearInterval(backspaceIntervalTimer.current);
+      backspaceIntervalTimer.current = null;
+    }
+    if (backspaceAccelerationTimer.current) {
+      clearTimeout(backspaceAccelerationTimer.current);
+      backspaceAccelerationTimer.current = null;
+    }
+  };
+
   const handleButtonPress = (e, key) => {
     e.preventDefault();
     e.stopPropagation();
@@ -182,8 +237,29 @@ const VirtualKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible,
   };
 
   return (
-    <div className={`virtual-keyboard ${isVisible ? 'visible' : ''}`}>
-      <div className="keyboard-container" tabIndex={-1}>
+    <div 
+      className={`virtual-keyboard ${isVisible ? 'visible' : ''}`}
+      onMouseDown={(e) => {
+        // Ngăn chặn blur event khi click vào bất kỳ đâu trong keyboard
+        e.preventDefault();
+      }}
+      onTouchStart={(e) => {
+        // Ngăn chặn blur event khi touch vào bất kỳ đâu trong keyboard trên mobile
+        e.preventDefault();
+      }}
+    >
+      <div 
+        className="keyboard-container" 
+        tabIndex={-1}
+        onMouseDown={(e) => {
+          // Ngăn chặn blur event khi click vào keyboard
+          e.preventDefault();
+        }}
+        onTouchStart={(e) => {
+          // Ngăn chặn blur event khi touch vào keyboard trên mobile
+          e.preventDefault();
+        }}
+      >
         {currentLayout.map((row, rowIndex) => (
           <div key={rowIndex} className="keyboard-row">
             {row.map((key) => (
@@ -199,6 +275,19 @@ const VirtualKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible,
                   onTouchMove={handleSpaceMove}
                   onTouchEnd={handleSpaceUp}
                   onTouchCancel={handleSpaceUp}
+                >
+                  {renderKey(key)}
+                </button>
+              ) : key === 'backspace' ? (
+                <button
+                  key={key}
+                  className={getKeyClassName(key)}
+                  onMouseDown={handleBackspaceDown}
+                  onMouseUp={handleBackspaceUp}
+                  onMouseLeave={handleBackspaceUp}
+                  onTouchStart={handleBackspaceDown}
+                  onTouchEnd={handleBackspaceUp}
+                  onTouchCancel={handleBackspaceUp}
                 >
                   {renderKey(key)}
                 </button>
