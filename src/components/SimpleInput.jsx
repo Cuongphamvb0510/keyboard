@@ -64,6 +64,20 @@ const SimpleInput = forwardRef(({ value, onChange, placeholder, onFocus, onBlur 
       const clampedPos = Math.max(0, Math.min(pos, value.length));
       input.setSelectionRange(clampedPos, clampedPos);
       setCursorPosition(clampedPos);
+      
+      // Auto scroll to cursor
+      setTimeout(() => {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        const computedStyle = window.getComputedStyle(input);
+        
+        context.font = `${computedStyle.fontSize} ${computedStyle.fontFamily}`;
+        const textBeforeCursor = value.substring(0, clampedPos);
+        const textWidth = context.measureText(textBeforeCursor).width;
+        
+        const inputWidth = input.offsetWidth;
+        input.scrollLeft = Math.max(0, textWidth - inputWidth + 40);
+      }, 0);
     },
     
     focus: () => {
@@ -106,7 +120,7 @@ const SimpleInput = forwardRef(({ value, onChange, placeholder, onFocus, onBlur 
     }
   };
 
-  // Calculate cursor position
+  // Calculate cursor position relative to visible text
   const getCursorLeftPosition = () => {
     if (!inputRef.current || !value) return 8;
 
@@ -118,8 +132,27 @@ const SimpleInput = forwardRef(({ value, onChange, placeholder, onFocus, onBlur 
     const textBeforeCursor = value.substring(0, cursorPosition);
     const textWidth = context.measureText(textBeforeCursor).width;
     
-    return 8 + textWidth; // 8px padding
+    // Trừ đi scrollLeft để tính vị trí cursor tương đối với phần hiển thị
+    const scrollLeft = inputRef.current.scrollLeft || 0;
+    return 8 + textWidth - scrollLeft;
   };
+
+  // Auto scroll to cursor when text is long
+  useEffect(() => {
+    if (inputRef.current && showCursor) {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      const computedStyle = window.getComputedStyle(inputRef.current);
+      
+      context.font = `${computedStyle.fontSize} ${computedStyle.fontFamily}`;
+      const textBeforeCursor = value.substring(0, cursorPosition);
+      const textWidth = context.measureText(textBeforeCursor).width;
+      
+      const inputWidth = inputRef.current.offsetWidth;
+      // Scroll để cursor luôn ở cuối input với padding 20px
+      inputRef.current.scrollLeft = Math.max(0, textWidth - inputWidth + 40);
+    }
+  }, [cursorPosition, showCursor, value]);
 
   return (
     <div className="simple-input-container">

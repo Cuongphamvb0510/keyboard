@@ -14,6 +14,10 @@
   /* Cho phép select text */
   -webkit-user-select: text;
   user-select: text;
+  /* Xử lý overflow text - cho phép scroll ngang */
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 /* Trên mobile, vẫn cho phép tương tác với input readonly */
@@ -50,8 +54,8 @@
 
 .custom-cursor {
   position: absolute;
-  top: 11px;
-  width: 2px;
+  top: 8px;
+  width: 1px;
   height: 20px;
   background-color: #007AFF;
   animation: blink 1s infinite;

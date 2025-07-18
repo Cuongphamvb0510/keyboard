@@ -229,8 +229,8 @@ const VirtualKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible,
     let display = key;
     if (key === 'shift') display = isShift ? '⇪' : '⇧';
     else if (key === 'backspace') display = '⌫';
-    else if (key === 'space') display = cursorMoveMode ? '⟷' : '';
-    else if (key === 'return') display = 'return';
+    else if (key === 'space') display = cursorMoveMode ? '⟷' : (isVietnamese ? 'dấu cách' : 'space');
+    else if (key === 'return') display = isVietnamese ? 'nhập' : 'return';
     else if (key === 'lang') display = isVietnamese ? 'VI' : 'EN';
     
     return display;

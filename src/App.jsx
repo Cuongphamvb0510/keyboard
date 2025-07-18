@@ -1,36 +1,24 @@
-import { useState, useRef, useEffect } from 'react'
 import './App.css'
+import Page from './components/Page'
+import Home from './pages/Home'
 import VirtualKeyboard from './components/VirtualKeyboard'
-import SimpleInput from './components/SimpleInput'
+import { KeyboardProvider } from './context/KeyboardContext.jsx'
+import { useKeyboard } from './hooks/useKeyboard'
+import { useState, useEffect } from 'react'
 import { processVietnameseInput } from './utils/telex'
 
-function App() {
+function AppContent() {
+  const { showKeyboard, setShowKeyboard, isVietnamese, setIsVietnamese, simpleInputRef } = useKeyboard()
   const [inputValue, setInputValue] = useState('')
-  const [showKeyboard, setShowKeyboard] = useState(false)
-  const [isVietnamese, setIsVietnamese] = useState(false)
-  const simpleInputRef = useRef(null)
-  const appRef = useRef(null)
-
-  useEffect(() => {
-    // Set viewport meta for mobile
-    const viewport = document.querySelector('meta[name="viewport"]')
-    if (!viewport) {
-      const meta = document.createElement('meta')
-      meta.name = 'viewport'
-      meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
-      document.head.appendChild(meta)
-    }
-    
-    // Update title
-    document.title = 'iPhone Keyboard'
-  }, [])
 
   // Đảm bảo input giữ focus khi keyboard hiển thị
   useEffect(() => {
     if (showKeyboard && simpleInputRef.current) {
       simpleInputRef.current.focus();
     }
-  }, [showKeyboard]);
+  }, [showKeyboard, simpleInputRef]);
+
+
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -57,7 +45,7 @@ function App() {
       document.removeEventListener('mousedown', handleClickOutside)
       document.removeEventListener('touchstart', handleClickOutside)
     }
-  }, [showKeyboard])
+  }, [showKeyboard, setShowKeyboard, simpleInputRef])
 
   const handleKeyPress = (key) => {
     if (simpleInputRef.current) {
@@ -103,41 +91,16 @@ function App() {
     }
   }
 
-  const handleInputFocus = () => {
-    setShowKeyboard(true)
-  }
-
-  const handleInputChange = (value) => {
-    setInputValue(value)
-  }
-
   const handleLanguageChange = (isViet) => {
     setIsVietnamese(isViet)
   }
 
   return (
-    <div className="app" ref={appRef}>
-      <div className="container">
-        <h1>iPhone</h1>
-        
-        <div className="input-demo">
-          <label>Nhập văn bản:</label>
-          <SimpleInput
-            ref={simpleInputRef}
-            value={inputValue}
-            onChange={handleInputChange}
-            onFocus={handleInputFocus}
-            placeholder="Nhấp vào đây để nhập..."
-
-          />
-        </div>
-
-        <div className="info">
-          <p>Giá trị hiện tại: <strong>{inputValue || '(trống)'}</strong></p>
-          <p>Chế độ: <strong>{isVietnamese ? 'Tiếng Việt (Telex)' : 'Tiếng Anh'}</strong></p>
-        </div>
-      </div>
-
+    <>
+      <Page isKeyboardVisible={showKeyboard}>
+        <Home inputValue={inputValue} setInputValue={setInputValue} />
+      </Page>
+      
       <VirtualKeyboard
         isVisible={showKeyboard}
         onKeyPress={handleKeyPress}
@@ -147,7 +110,15 @@ function App() {
         onCursorMove={handleCursorMove}
         onLanguageChange={handleLanguageChange}
       />
-    </div>
+    </>
+  )
+}
+
+function App() {
+  return (
+    <KeyboardProvider>
+      <AppContent />
+    </KeyboardProvider>
   )
 }
 
